@@ -16,6 +16,7 @@ const LANGUAGES: Array[String] = ["en", "ja", "zh"]
 const DEFAULT_LANGUAGE := "en"
 const LANGUAGE_BUTTON_BASE_SIZE := Vector2(58, 34)
 const BACKGROUND_ASSET := "casino_office_base.png"
+const PINBOARD_LABEL_BASE_FONT_SIZE := 14
 const DEALER_ASSETS := {
 	"idle": "Dealer/dealer_idle.png",
 	"smirk": "Dealer/dealer_smirk.png",
@@ -54,11 +55,14 @@ enum GameState {
 @onready var language_label: Label = $LanguagePanel/LanguageRow/LanguageLabel
 @onready var fullscreen_mini_game_container: Control = $FullscreenMiniGameContainer
 @onready var developer_button: Button = $DeveloperButton
+@onready var pinboard: Control = $Pinboard
+@onready var pinboard_label: Label = $Pinboard/LoopCountLabel
 
 var state: GameState = GameState.TITLE
 var rng := RandomNumberGenerator.new()
 var language_buttons: Array[Button] = []
 var loop_count := 0
+var has_failed_this_run := false
 var scenario_order: Array = []
 var current_scenario_index := 0
 var completed_scenarios_this_loop: Array = []
@@ -80,6 +84,9 @@ var end_screen_base_offsets := Vector4.ZERO
 var language_label_base_minimum_size := Vector2.ZERO
 var developer_button_base_minimum_size := Vector2.ZERO
 var language_row_base_separation := 0
+var pinboard_base_background_rect := Rect2()
+var pinboard_base_rect := Rect2()
+var pinboard_background_ratio_rect := Rect2()
 
 
 func _ready() -> void:
@@ -123,6 +130,7 @@ func _apply_responsive_layout() -> void:
 	if developer_button == null or language_row == null or mini_game_container == null:
 		return
 	_apply_visual_style()
+	_apply_pinboard_layout()
 	_resize_language_panel()
 	ResponsiveScale.set_scaled_offsets(language_row, language_row_base_offsets)
 	ResponsiveScale.set_scaled_offsets(mini_game_container, mini_game_container_base_offsets)
@@ -163,6 +171,70 @@ func _capture_layout_baseline() -> void:
 	language_label_base_minimum_size = language_label.custom_minimum_size
 	developer_button_base_minimum_size = developer_button.custom_minimum_size
 	language_row_base_separation = language_row.get_theme_constant("separation")
+	_capture_pinboard_baseline()
+
+
+func _capture_pinboard_baseline() -> void:
+	pinboard_base_background_rect = _background_content_rect()
+	pinboard_base_rect = Rect2(pinboard.position, pinboard.size)
+	if pinboard_base_background_rect.size.x <= 0.0 or pinboard_base_background_rect.size.y <= 0.0:
+		pinboard_background_ratio_rect = Rect2()
+		return
+	pinboard_background_ratio_rect = Rect2(
+		Vector2(
+			(pinboard_base_rect.position.x - pinboard_base_background_rect.position.x) / pinboard_base_background_rect.size.x,
+			(pinboard_base_rect.position.y - pinboard_base_background_rect.position.y) / pinboard_base_background_rect.size.y
+		),
+		Vector2(
+			pinboard_base_rect.size.x / pinboard_base_background_rect.size.x,
+			pinboard_base_rect.size.y / pinboard_base_background_rect.size.y
+		)
+	)
+
+
+func _background_content_rect() -> Rect2:
+	var viewport_size := get_viewport_rect().size
+	var texture := background.texture
+	if texture == null:
+		return Rect2(Vector2.ZERO, viewport_size)
+	var texture_size := texture.get_size()
+	if texture_size.x <= 0.0 or texture_size.y <= 0.0:
+		return Rect2(Vector2.ZERO, viewport_size)
+	var scale := maxf(viewport_size.x / texture_size.x, viewport_size.y / texture_size.y)
+	var content_size := texture_size * scale
+	return Rect2((viewport_size - content_size) * 0.5, content_size)
+
+
+func _apply_pinboard_layout() -> void:
+	if pinboard == null or pinboard_label == null:
+		return
+	var background_rect := _background_content_rect()
+	var pinboard_rect := Rect2(
+		background_rect.position + pinboard_background_ratio_rect.position * background_rect.size,
+		pinboard_background_ratio_rect.size * background_rect.size
+	)
+	pinboard.anchor_left = 0.0
+	pinboard.anchor_top = 0.0
+	pinboard.anchor_right = 0.0
+	pinboard.anchor_bottom = 0.0
+	pinboard.offset_left = pinboard_rect.position.x
+	pinboard.offset_top = pinboard_rect.position.y
+	pinboard.offset_right = pinboard_rect.position.x + pinboard_rect.size.x
+	pinboard.offset_bottom = pinboard_rect.position.y + pinboard_rect.size.y
+	pinboard_label.add_theme_font_size_override("font_size", ResponsiveScale.font_size(self, PINBOARD_LABEL_BASE_FONT_SIZE))
+
+
+func _refresh_pinboard() -> void:
+	if pinboard == null or pinboard_label == null:
+		return
+	pinboard.visible = has_failed_this_run and loop_count > 1
+	pinboard_label.text = "%d" % (loop_count - 1)
+	_apply_pinboard_layout()
+
+
+func _hide_pinboard() -> void:
+	if pinboard != null:
+		pinboard.visible = false
 
 
 func _load_translations() -> void:
@@ -300,6 +372,7 @@ func _show_title() -> void:
 	state = GameState.TITLE
 	_hide_game_surfaces()
 	_clear_mini_game_containers()
+	_hide_pinboard()
 	title_screen.visible = true
 	title_screen.call("set_texts", _language_texts())
 	dialogue_box.visible = false
@@ -318,6 +391,8 @@ func _start_new_run() -> void:
 
 	_generate_seed_data()
 	loop_count = 0
+	has_failed_this_run = false
+	_refresh_pinboard()
 	current_scenario_index = 0
 	completed_scenarios_this_loop.clear()
 	scenario_order.clear()
@@ -339,6 +414,7 @@ func _generate_seed_data() -> void:
 func _start_new_loop(play_opening_dialogue: bool = false) -> void:
 	state = GameState.LOOP_START
 	loop_count += 1
+	_refresh_pinboard()
 	current_scenario_index = 0
 	completed_scenarios_this_loop.clear()
 	scenario_order = SCENARIOS.duplicate()
@@ -448,6 +524,7 @@ func _on_mini_game_lost(_reason: String) -> void:
 	current_mini_game = null
 	_hide_game_surfaces()
 	await _death_transition()
+	has_failed_this_run = true
 	await _start_new_loop(true)
 
 

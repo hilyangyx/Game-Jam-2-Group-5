@@ -1,8 +1,2 @@
 res://Main.tscn
-res://Localization/zh.json
-res://MiniGames/ScenarioItemView.gd
-res://MiniGames/ScenarioItemView.tscn
-res://Screens/TitleScreen.tscn
-res://DialogueBox.tscn
-res://Localization/en.json
 res://Main.gd

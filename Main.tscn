@@ -74,6 +74,30 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 14
 vertical_alignment = 1
 
+[node name="Pinboard" type="Control" parent="." unique_id=1148707906]
+visible = false
+layout_mode = 1
+offset_left = 943.0
+offset_top = 213.0
+offset_right = 983.0
+offset_bottom = 253.0
+mouse_filter = 2
+
+[node name="LoopCountLabel" type="Label" parent="Pinboard" unique_id=1770516928]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -6.0
+offset_right = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.15686275, 0.15686275, 0.15686275, 1)
+theme_override_font_sizes/font_size = 14
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="TablePanel" type="Panel" parent="." unique_id=1312294158]
 visible = false
 layout_mode = 1
@@ -174,6 +198,7 @@ mouse_filter = 2
 color = Color(0, 0, 0, 0)
 
 [node name="DeveloperButton" type="Button" parent="." unique_id=1592988197]
+visible = false
 custom_minimum_size = Vector2(106, 34)
 layout_mode = 1
 anchors_preset = -1
