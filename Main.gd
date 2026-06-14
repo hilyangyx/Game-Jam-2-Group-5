@@ -6,17 +6,16 @@ const WAR_SCENE = preload("res://MiniGames/WarGame.tscn")
 const CARD_FLIP_SCRIPT = preload("res://MiniGames/CardFlipGame.gd")
 const HUNGRY_CROC_SCRIPT = preload("res://MiniGames/HungryCrocGame.gd")
 const WAR_SCRIPT = preload("res://MiniGames/WarGame.gd")
+const ResponsiveScale = preload("res://UI/ResponsiveScale.gd")
+const TextureLoader = preload("res://UI/TextureLoader.gd")
+const LocalizationLoader = preload("res://UI/LocalizationLoader.gd")
 const LOCALIZATION_DIR := "res://Localization"
 const ASSET_DIR := "res://Assets"
 const SCENARIOS: Array[String] = ["card_flip", "hungry_croc", "war"]
 const LANGUAGES: Array[String] = ["en", "ja", "zh"]
 const DEFAULT_LANGUAGE := "en"
-const LANGUAGE_PANEL_MARGIN := 16.0
-const LANGUAGE_PANEL_HEIGHT := 46.0
-const LANGUAGE_PANEL_PADDING_X := 8.0
-const LANGUAGE_LABEL_WIDTH := 78.0
-const LANGUAGE_BUTTON_WIDTH := 58.0
-const LANGUAGE_ROW_SEPARATION := 6.0
+const LANGUAGE_BUTTON_BASE_SIZE := Vector2(58, 34)
+const BACKGROUND_ASSET := "casino_office_base.png"
 const DEALER_ASSETS := {
 	"idle": "Dealer/dealer_idle.png",
 	"smirk": "Dealer/dealer_smirk.png",
@@ -53,6 +52,7 @@ enum GameState {
 @onready var language_panel: Panel = $LanguagePanel
 @onready var language_row: HBoxContainer = $LanguagePanel/LanguageRow
 @onready var language_label: Label = $LanguagePanel/LanguageRow/LanguageLabel
+@onready var fullscreen_mini_game_container: Control = $FullscreenMiniGameContainer
 @onready var developer_button: Button = $DeveloperButton
 
 var state: GameState = GameState.TITLE
@@ -70,12 +70,25 @@ var current_language := DEFAULT_LANGUAGE
 var translations: Dictionary = {}
 var current_dealer_state := "idle"
 var current_mini_game: Node
+var language_panel_base_offsets := Vector4.ZERO
+var language_row_base_offsets := Vector4.ZERO
+var mini_game_container_base_offsets := Vector4.ZERO
+var developer_button_base_offsets := Vector4.ZERO
+var title_screen_base_offsets := Vector4.ZERO
+var final_shoot_screen_base_offsets := Vector4.ZERO
+var end_screen_base_offsets := Vector4.ZERO
+var language_label_base_minimum_size := Vector2.ZERO
+var developer_button_base_minimum_size := Vector2.ZERO
+var language_row_base_separation := 0
 
 
 func _ready() -> void:
 	rng.randomize()
 	_load_translations()
+	_capture_layout_baseline()
 	_apply_visual_style()
+	_apply_responsive_layout()
+	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_connect_screen_signals()
 	_build_language_selector()
 	dialogue_box.line_started.connect(_on_dialogue_line_started)
@@ -95,15 +108,35 @@ func _connect_screen_signals() -> void:
 
 
 func _apply_visual_style() -> void:
-	background.texture = _load_texture("casino_office_base.png")
+	background.texture = TextureLoader.load_from_dir(ASSET_DIR, BACKGROUND_ASSET)
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	dealer.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	dealer.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	dealer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_set_panel_style(table_panel, Color(0.035, 0.18, 0.11, 0.98), Color(0.33, 0.17, 0.06, 1.0), 3)
-	_set_panel_style(dialogue_box, Color(0.025, 0.023, 0.028, 0.98), Color(0.6, 0.45, 0.18, 1.0), 2)
+	_set_panel_style(table_panel, Color(0.035, 0.18, 0.11, 0.98), Color(0.33, 0.17, 0.06, 1.0), maxi(1, roundi(ResponsiveScale.length(self, 3))))
+	_set_panel_style(dialogue_box, Color(0.025, 0.023, 0.028, 0.98), Color(0.6, 0.45, 0.18, 1.0), maxi(1, roundi(ResponsiveScale.length(self, 2))))
+
+
+func _apply_responsive_layout() -> void:
+	if developer_button == null or language_row == null or mini_game_container == null:
+		return
+	_apply_visual_style()
+	_resize_language_panel()
+	ResponsiveScale.set_scaled_offsets(language_row, language_row_base_offsets)
+	ResponsiveScale.set_scaled_offsets(mini_game_container, mini_game_container_base_offsets)
+	ResponsiveScale.set_scaled_offsets(title_screen, title_screen_base_offsets)
+	ResponsiveScale.set_scaled_offsets(final_shoot_screen, final_shoot_screen_base_offsets)
+	ResponsiveScale.set_scaled_offsets(end_screen, end_screen_base_offsets)
+	if fullscreen_mini_game_container != null:
+		fullscreen_mini_game_container.set_anchors_preset(Control.PRESET_FULL_RECT)
+		ResponsiveScale.set_scaled_offsets(fullscreen_mini_game_container, Vector4.ZERO)
+	developer_button.custom_minimum_size = ResponsiveScale.size(self, developer_button_base_minimum_size)
+	developer_button.add_theme_font_size_override("font_size", ResponsiveScale.font_size(self, 14))
+	ResponsiveScale.set_scaled_offsets(developer_button, developer_button_base_offsets)
+	if dialogue_box.has_method("apply_responsive_layout"):
+		dialogue_box.call("apply_responsive_layout")
 
 
 func _set_panel_style(panel: Control, fill: Color, border: Color, border_width: int) -> void:
@@ -111,40 +144,31 @@ func _set_panel_style(panel: Control, fill: Color, border: Color, border_width: 
 	style.bg_color = fill
 	style.border_color = border
 	style.set_border_width_all(border_width)
-	style.corner_radius_top_left = 6
-	style.corner_radius_top_right = 6
-	style.corner_radius_bottom_left = 6
-	style.corner_radius_bottom_right = 6
+	var radius := maxi(1, roundi(ResponsiveScale.length(panel, 6)))
+	style.corner_radius_top_left = radius
+	style.corner_radius_top_right = radius
+	style.corner_radius_bottom_left = radius
+	style.corner_radius_bottom_right = radius
 	panel.add_theme_stylebox_override("panel", style)
 
 
-func _asset_path(file_name: String) -> String:
-	return "%s/%s" % [ASSET_DIR, file_name]
-
-
-func _load_texture(file_name: String) -> Texture2D:
-	var path: String = _asset_path(file_name)
-	if not ResourceLoader.exists(path):
-		return null
-	return ResourceLoader.load(path) as Texture2D
+func _capture_layout_baseline() -> void:
+	language_panel_base_offsets = ResponsiveScale.offsets(language_panel)
+	language_row_base_offsets = ResponsiveScale.offsets(language_row)
+	mini_game_container_base_offsets = ResponsiveScale.offsets(mini_game_container)
+	developer_button_base_offsets = ResponsiveScale.offsets(developer_button)
+	title_screen_base_offsets = ResponsiveScale.offsets(title_screen)
+	final_shoot_screen_base_offsets = ResponsiveScale.offsets(final_shoot_screen)
+	end_screen_base_offsets = ResponsiveScale.offsets(end_screen)
+	language_label_base_minimum_size = language_label.custom_minimum_size
+	developer_button_base_minimum_size = developer_button.custom_minimum_size
+	language_row_base_separation = language_row.get_theme_constant("separation")
 
 
 func _load_translations() -> void:
 	translations.clear()
 	for language_code in LANGUAGES:
-		var language_path: String = "%s/%s.json" % [LOCALIZATION_DIR, language_code]
-		if not FileAccess.file_exists(language_path):
-			translations[language_code] = {}
-			continue
-		var file := FileAccess.open(language_path, FileAccess.READ)
-		if file == null:
-			translations[language_code] = {}
-			continue
-		var parsed: Variant = JSON.parse_string(file.get_as_text())
-		if parsed is Dictionary:
-			translations[language_code] = parsed
-		else:
-			translations[language_code] = {}
+		translations[language_code] = LocalizationLoader.load_language(LOCALIZATION_DIR, language_code)
 
 
 func _t(key: String, values: Array = []) -> String:
@@ -165,11 +189,11 @@ func _language_texts() -> Dictionary:
 
 
 func _build_language_selector() -> void:
-	_set_panel_style(language_panel, Color(0.045, 0.043, 0.05, 0.94), Color(0.55, 0.42, 0.16, 1.0), 1)
-	language_row.add_theme_constant_override("separation", int(LANGUAGE_ROW_SEPARATION))
-	language_label.custom_minimum_size = Vector2(LANGUAGE_LABEL_WIDTH, 0)
+	_set_panel_style(language_panel, Color(0.045, 0.043, 0.05, 0.94), Color(0.55, 0.42, 0.16, 1.0), maxi(1, roundi(ResponsiveScale.length(self, 1))))
+	language_row.add_theme_constant_override("separation", maxi(1, roundi(ResponsiveScale.length(self, language_row_base_separation))))
+	language_label.custom_minimum_size = ResponsiveScale.size(self, language_label_base_minimum_size)
+	language_label.add_theme_font_size_override("font_size", ResponsiveScale.font_size(self, 14))
 	language_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	language_label.add_theme_font_size_override("font_size", 14)
 
 	for child in language_row.get_children():
 		if child != language_label:
@@ -178,8 +202,8 @@ func _build_language_selector() -> void:
 	language_buttons.clear()
 	for language_code in LANGUAGES:
 		var button := Button.new()
-		button.custom_minimum_size = Vector2(LANGUAGE_BUTTON_WIDTH, 34)
-		button.add_theme_font_size_override("font_size", 13)
+		button.custom_minimum_size = ResponsiveScale.size(self, LANGUAGE_BUTTON_BASE_SIZE)
+		button.add_theme_font_size_override("font_size", ResponsiveScale.font_size(self, 14))
 		button.pressed.connect(_on_language_button_pressed.bind(language_code))
 		language_row.add_child(button)
 		language_buttons.append(button)
@@ -198,18 +222,37 @@ func _refresh_language_selector() -> void:
 
 
 func _resize_language_panel() -> void:
+	if language_panel == null or language_row == null or language_label == null:
+		return
+	var scale := ResponsiveScale.factor(self)
+	var margin := -language_panel_base_offsets.z * scale
+	var panel_height := (language_panel_base_offsets.w - language_panel_base_offsets.y) * scale
+	var padding_x := language_row_base_offsets.x * scale
+	var label_width := language_label_base_minimum_size.x * scale
+	var row_separation := float(language_row_base_separation) * scale
+	_set_panel_style(language_panel, Color(0.045, 0.043, 0.05, 0.94), Color(0.55, 0.42, 0.16, 1.0), maxi(1, roundi(ResponsiveScale.length(self, 1))))
+	language_row.add_theme_constant_override("separation", maxi(1, roundi(row_separation)))
+	language_label.custom_minimum_size = Vector2(label_width, 0)
+	language_label.add_theme_font_size_override("font_size", ResponsiveScale.font_size(self, 14))
+	var button_width_total := 0.0
+	for i in range(language_buttons.size()):
+		var button := language_buttons[i]
+		var button_size := LANGUAGE_BUTTON_BASE_SIZE * scale
+		button_width_total += button_size.x
+		button.custom_minimum_size = button_size
+		button.add_theme_font_size_override("font_size", ResponsiveScale.font_size(self, 14))
 	var button_count: int = language_buttons.size()
 	var visible_child_count: int = button_count + 1
-	var separation_total: float = float(maxi(0, visible_child_count - 1)) * LANGUAGE_ROW_SEPARATION
-	var panel_width: float = (LANGUAGE_PANEL_PADDING_X * 2.0) + LANGUAGE_LABEL_WIDTH + (float(button_count) * LANGUAGE_BUTTON_WIDTH) + separation_total
+	var separation_total: float = float(maxi(0, visible_child_count - 1)) * row_separation
+	var panel_width: float = (padding_x * 2.0) + label_width + button_width_total + separation_total
 	language_panel.anchor_left = 1.0
 	language_panel.anchor_right = 1.0
 	language_panel.anchor_top = 0.0
 	language_panel.anchor_bottom = 0.0
-	language_panel.offset_left = -LANGUAGE_PANEL_MARGIN - panel_width
-	language_panel.offset_right = -LANGUAGE_PANEL_MARGIN
-	language_panel.offset_top = LANGUAGE_PANEL_MARGIN
-	language_panel.offset_bottom = LANGUAGE_PANEL_MARGIN + LANGUAGE_PANEL_HEIGHT
+	language_panel.offset_left = -margin - panel_width
+	language_panel.offset_right = -margin
+	language_panel.offset_top = margin
+	language_panel.offset_bottom = margin + panel_height
 
 
 func _on_language_button_pressed(language_code: String) -> void:
@@ -256,7 +299,7 @@ func _refresh_current_view_language() -> void:
 func _show_title() -> void:
 	state = GameState.TITLE
 	_hide_game_surfaces()
-	_clear_container(mini_game_container)
+	_clear_mini_game_containers()
 	title_screen.visible = true
 	title_screen.call("set_texts", _language_texts())
 	dialogue_box.visible = false
@@ -268,9 +311,10 @@ func _on_begin_pressed() -> void:
 
 
 func _start_new_run() -> void:
+	dealer.visible = true
 	state = GameState.OPENING_DIALOGUE
 	_hide_game_surfaces()
-	_clear_container(mini_game_container)
+	_clear_mini_game_containers()
 
 	_generate_seed_data()
 	loop_count = 0
@@ -299,7 +343,7 @@ func _start_new_loop(play_opening_dialogue: bool = false) -> void:
 	completed_scenarios_this_loop.clear()
 	scenario_order = SCENARIOS.duplicate()
 	_shuffle_array(scenario_order)
-	_clear_container(mini_game_container)
+	_clear_mini_game_containers()
 	_hide_game_surfaces()
 	if play_opening_dialogue:
 		state = GameState.OPENING_DIALOGUE
@@ -309,7 +353,7 @@ func _start_new_loop(play_opening_dialogue: bool = false) -> void:
 
 func _begin_current_scenario() -> void:
 	state = GameState.SCENARIO_INTRO
-	_clear_container(mini_game_container)
+	_clear_mini_game_containers()
 	_hide_game_surfaces()
 
 	var scenario := _current_scenario()
@@ -332,16 +376,20 @@ func _on_scenario_item_pressed() -> void:
 
 func _start_current_mini_game() -> void:
 	state = GameState.MINI_GAME_ACTIVE
-	_clear_container(mini_game_container)
+	_clear_mini_game_containers()
 	_hide_game_surfaces()
 	table_panel.visible = true
-	mini_game_container.visible = true
 
 	var scenario := _current_scenario()
 	var game: Node = _create_mini_game(scenario)
 	if game == null:
 		return
-	mini_game_container.add_child(game)
+	if scenario == "war":
+		fullscreen_mini_game_container.visible = true
+		fullscreen_mini_game_container.add_child(game)
+	else:
+		mini_game_container.visible = true
+		mini_game_container.add_child(game)
 	current_mini_game = game
 
 	var seed_data: Dictionary = mini_game_seed_data.get(scenario, {})
@@ -378,7 +426,7 @@ func _complete_current_scenario(play_success_dialogue: bool) -> void:
 	var scenario := _current_scenario()
 	if not completed_scenarios_this_loop.has(scenario):
 		completed_scenarios_this_loop.append(scenario)
-	_clear_container(mini_game_container)
+	_clear_mini_game_containers()
 	current_mini_game = null
 	_hide_game_surfaces()
 	if play_success_dialogue:
@@ -396,7 +444,7 @@ func _on_mini_game_lost(_reason: String) -> void:
 		return
 	state = GameState.DEATH_DIALOGUE
 	await _play_dialogue([_death_dialogue()])
-	_clear_container(mini_game_container)
+	_clear_mini_game_containers()
 	current_mini_game = null
 	_hide_game_surfaces()
 	await _death_transition()
@@ -405,7 +453,7 @@ func _on_mini_game_lost(_reason: String) -> void:
 
 func _start_final_dialogue() -> void:
 	state = GameState.FINAL_DIALOGUE
-	_clear_container(mini_game_container)
+	_clear_mini_game_containers()
 	_hide_game_surfaces()
 	await _play_dialogue([
 		_dialogue("shocked", "dialogue.final.1"),
@@ -440,6 +488,7 @@ func _show_ending_after_shot() -> void:
 
 
 func _show_ending_screen() -> void:
+	dealer.visible = false
 	state = GameState.END_SCREEN
 	_hide_game_surfaces()
 	end_screen.visible = true
@@ -526,7 +575,7 @@ func _scenario_intro_dialogue(scenario: String) -> Array:
 func _correct_dialogue() -> Dictionary:
 	var early: Array = [
 		_dialogue("composed", "dialogue.correct.early.1"),
-		_dialogue("smirk", "dialogue.correct.early.2")
+		_dialogue("composed", "dialogue.correct.early.2")
 	]
 	var mid: Array = [
 		_dialogue("suspicious", "dialogue.correct.mid.1"),
@@ -548,19 +597,15 @@ func _correct_dialogue() -> Dictionary:
 
 func _death_dialogue() -> Dictionary:
 	var early: Array = [
-		_dialogue("smirk", "dialogue.death.early.1"),
-		_dialogue("idle", "dialogue.death.early.2"),
-		_dialogue("laughing", "dialogue.death.early.3")
+		_dialogue("idle", "dialogue.death.early.1"),
+		_dialogue("dile", "dialogue.death.early.2"),
 	]
 	var mid: Array = [
-		_dialogue("idle", "dialogue.death.mid.1"),
-		_dialogue("suspicious", "dialogue.death.mid.2"),
-		_dialogue("idle", "dialogue.death.mid.3")
+		_dialogue("smirk", "dialogue.death.mid.1"),
+		_dialogue("smirk", "dialogue.death.mid.2"),
 	]
 	var late: Array = [
-		_dialogue("suspicious", "dialogue.death.late.1"),
-		_dialogue("suspicious", "dialogue.death.late.2"),
-		_dialogue("composed", "dialogue.death.late.3")
+		_dialogue("laughing", "dialogue.death.late.1"),
 	]
 	var pool: Array = early
 	if loop_count >= 6:
@@ -579,7 +624,7 @@ func _on_dialogue_line_started(line_data: Dictionary) -> void:
 func _set_dealer_state(dealer_state: String) -> void:
 	current_dealer_state = dealer_state
 	var dealer_asset_name: String = str(DEALER_ASSETS.get(dealer_state, DEALER_ASSETS["idle"]))
-	var dealer_texture: Texture2D = _load_texture(dealer_asset_name)
+	var dealer_texture: Texture2D = TextureLoader.load_from_dir(ASSET_DIR, dealer_asset_name)
 	if dealer_texture != null:
 		dealer.texture = dealer_texture
 
@@ -603,8 +648,16 @@ func _hide_game_surfaces() -> void:
 	scenario_item_view.visible = false
 	table_panel.visible = false
 	mini_game_container.visible = false
+	if fullscreen_mini_game_container != null:
+		fullscreen_mini_game_container.visible = false
 	final_shoot_screen.visible = false
 	end_screen.visible = false
+
+
+func _clear_mini_game_containers() -> void:
+	_clear_container(mini_game_container)
+	if fullscreen_mini_game_container != null:
+		_clear_container(fullscreen_mini_game_container)
 
 
 func _clear_container(container: Node) -> void:

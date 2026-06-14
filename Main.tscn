@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" uid="uid://chx8e6efcrepo" path="res://Main.gd" id="1_main"]
 [ext_resource type="PackedScene" uid="uid://bukcrosv5uou0" path="res://DialogueBox.tscn" id="2_dialogue"]
-[ext_resource type="Texture2D" uid="uid://2sly0wyl6ec3" path="res://Assets/casino_office_base.png" id="3_bg"]
-[ext_resource type="Texture2D" uid="uid://baxmbvhoiyynm" path="res://Assets/Dealer/dealer_idle.png" id="4_dealer"]
-[ext_resource type="PackedScene" path="res://MiniGames/ScenarioItemView.tscn" id="5_item"]
-[ext_resource type="PackedScene" path="res://Screens/TitleScreen.tscn" id="6_title"]
+[ext_resource type="Texture2D" uid="uid://b31mfwgjjihv1" path="res://Assets/casino_office_base.png" id="3_bg"]
+[ext_resource type="Texture2D" uid="uid://b4yjqriryfmlx" path="res://Assets/Dealer/dealer_idle.png" id="4_dealer"]
+[ext_resource type="PackedScene" uid="uid://b5d6ypm427ur3" path="res://MiniGames/ScenarioItemView.tscn" id="5_item"]
+[ext_resource type="PackedScene" uid="uid://bolcdmo2bilg6" path="res://Screens/TitleScreen.tscn" id="6_title"]
 [ext_resource type="PackedScene" path="res://Screens/FinalShootScreen.tscn" id="7_final"]
 [ext_resource type="PackedScene" path="res://Screens/EndScreen.tscn" id="8_end"]
 
@@ -31,12 +31,15 @@ expand_mode = 1
 stretch_mode = 6
 
 [node name="Dealer" type="TextureRect" parent="." unique_id=808781117]
+visible = false
 layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.33
-anchor_top = 0.04
-anchor_right = 0.67
-anchor_bottom = 0.29
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -120.0
+offset_right = 120.0
+offset_bottom = 240.0
+grow_horizontal = 2
 mouse_filter = 2
 texture = ExtResource("4_dealer")
 expand_mode = 1
@@ -93,6 +96,16 @@ offset_bottom = -18.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="FullscreenMiniGameContainer" type="Control" parent="." unique_id=252456867]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
 [node name="ScenarioItemView" parent="." unique_id=1660195272 instance=ExtResource("5_item")]
 visible = false
 layout_mode = 1
@@ -113,29 +126,41 @@ anchor_bottom = 0.97
 [node name="TitleScreen" parent="." unique_id=47607977 instance=ExtResource("6_title")]
 visible = false
 layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.28
-anchor_top = 0.24
-anchor_right = 0.72
-anchor_bottom = 0.72
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -200.0
+offset_right = 250.0
+offset_bottom = 200.0
 
 [node name="FinalShootScreen" parent="." unique_id=2139448310 instance=ExtResource("7_final")]
 visible = false
 layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.28
-anchor_top = 0.3
-anchor_right = 0.72
-anchor_bottom = 0.73
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -200.0
+offset_right = 250.0
+offset_bottom = 200.0
 
 [node name="EndScreen" parent="." unique_id=142655928 instance=ExtResource("8_end")]
 visible = false
 layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.28
-anchor_top = 0.3
-anchor_right = 0.72
-anchor_bottom = 0.73
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -200.0
+offset_right = 250.0
+offset_bottom = 200.0
 
 [node name="TransitionOverlay" type="ColorRect" parent="." unique_id=1600558734]
 visible = false
@@ -156,5 +181,5 @@ offset_left = 16.0
 offset_top = 16.0
 offset_right = 122.0
 offset_bottom = 50.0
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 14
 text = "DEV SKIP"

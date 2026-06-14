@@ -9,4 +9,70 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1_war")
+
+[node name="Root" type="Control" parent="." unique_id=1275874923]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CardArea" type="VBoxContainer" parent="Root" unique_id=1038607332]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.12
+anchor_top = 0.34
+anchor_right = 0.88
+anchor_bottom = 0.83
+offset_left = 18.0
+offset_top = 15.399948
+offset_right = -18.0
+offset_bottom = -15.400024
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 22
+
+[node name="DealerHandArea" type="VBoxContainer" parent="Root/CardArea" unique_id=494105718]
+custom_minimum_size = Vector2(380, 150)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="CardsBox" type="HBoxContainer" parent="Root/CardArea/DealerHandArea" unique_id=2123394993]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="PlayerHandArea" type="VBoxContainer" parent="Root/CardArea" unique_id=1262326511]
+custom_minimum_size = Vector2(380, 150)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="CardsBox" type="HBoxContainer" parent="Root/CardArea/PlayerHandArea" unique_id=1286247130]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="OptionsBar" type="CenterContainer" parent="Root" unique_id=1662695529]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -82.0
+offset_bottom = -18.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="OptionsBox" type="HBoxContainer" parent="Root/OptionsBar" unique_id=732216203]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 14
+alignment = 1

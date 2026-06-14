@@ -1,9 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://bolcdmo2bilg6"]
 
-[ext_resource type="Script" path="res://Screens/TitleScreen.gd" id="1_title"]
+[ext_resource type="Script" uid="uid://4sixokfpor2c" path="res://Screens/TitleScreen.gd" id="1_title"]
 
-[node name="TitleScreen" type="Panel"]
-layout_mode = 3
+[node name="TitleScreen" type="Panel" unique_id=1297077833]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -11,7 +10,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_title")
 
-[node name="Content" type="VBoxContainer" parent="."]
+[node name="Content" type="VBoxContainer" parent="." unique_id=1711271547]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -25,12 +24,12 @@ grow_vertical = 2
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="Content"]
+[node name="TitleLabel" type="Label" parent="Content" unique_id=2080564422]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 horizontal_alignment = 1
 
-[node name="BeginButton" type="Button" parent="Content"]
+[node name="BeginButton" type="Button" parent="Content" unique_id=606491667]
 custom_minimum_size = Vector2(180, 52)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22

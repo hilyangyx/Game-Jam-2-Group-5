@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://5clpkyaatog"]
 
-[ext_resource type="Script" path="res://MiniGames/CardFlipGame.gd" id="1_card"]
+[ext_resource type="Script" uid="uid://2sog4mdb1ry7" path="res://MiniGames/CardFlipGame.gd" id="1_card"]
 
-[node name="CardFlipGame" type="Control"]
+[node name="CardFlipGame" type="Control" unique_id=1094492866]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,3 +11,22 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_card")
 
+[node name="CardGridRoot" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 12.0
+offset_right = -20.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CardGrid" type="GridContainer" parent="CardGridRoot"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 4
