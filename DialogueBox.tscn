@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://bukcrosv5uou0"]
+
+[ext_resource type="Script" uid="uid://04jnbl3mte48" path="res://DialogueBox.gd" id="1_dialogue"]
+
+[node name="DialogueBox" type="Panel" unique_id=1498650913]
+visible = false
+custom_minimum_size = Vector2(840, 140)
+script = ExtResource("1_dialogue")
+
+[node name="SpeakerLabel" type="Label" parent="." unique_id=271341740]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.03
+anchor_top = 0.08
+anchor_right = 0.35
+anchor_bottom = 0.28
+theme_override_font_sizes/font_size = 20
+
+[node name="StateLabel" type="Label" parent="." unique_id=966783392]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.38
+anchor_top = 0.08
+anchor_right = 0.68
+anchor_bottom = 0.28
+theme_override_font_sizes/font_size = 14
+
+[node name="LineLabel" type="Label" parent="." unique_id=786521996]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.03
+anchor_top = 0.32
+anchor_right = 0.78
+anchor_bottom = 0.88
+theme_override_font_sizes/font_size = 22
+autowrap_mode = 3
+
+[node name="ContinueButton" type="Button" parent="." unique_id=1477090450]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.82
+anchor_top = 0.54
+anchor_right = 0.97
+anchor_bottom = 0.85

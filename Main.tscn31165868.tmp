@@ -1,0 +1,188 @@
+[gd_scene format=3 uid="uid://dbm54at6o1g6b"]
+
+[ext_resource type="Script" uid="uid://chx8e6efcrepo" path="res://Main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://DialogueBox.tscn" id="2_dialogue"]
+
+[node name="Main" type="Control" unique_id=1822409621]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="Background" type="ColorRect" parent="." unique_id=2066879167]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0352941, 0.027451, 0.0313726, 1)
+
+[node name="PinboardPanel" type="Panel" parent="." unique_id=1175826629]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.03
+anchor_top = 0.06
+anchor_right = 0.24
+anchor_bottom = 0.22
+
+[node name="TallyLabel" type="Label" parent="PinboardPanel" unique_id=1470441765]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 10.0
+offset_right = -12.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 18
+text = "WALL NOTE
+"
+vertical_alignment = 1
+
+[node name="DealerPanel" type="Panel" parent="." unique_id=464849984]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.33
+anchor_top = 0.04
+anchor_right = 0.67
+anchor_bottom = 0.29
+
+[node name="DealerPortrait" type="Control" parent="DealerPanel" unique_id=1363720248]
+layout_mode = 1
+anchor_left = 0.06
+anchor_top = 0.14
+anchor_right = 0.37
+anchor_bottom = 0.86
+
+[node name="DealerNameLabel" type="Label" parent="DealerPanel" unique_id=229889719]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.42
+anchor_top = 0.18
+anchor_right = 0.94
+anchor_bottom = 0.36
+theme_override_font_sizes/font_size = 24
+text = "DEALER"
+
+[node name="DealerStateLabel" type="Label" parent="DealerPanel" unique_id=461418732]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.42
+anchor_top = 0.43
+anchor_right = 0.94
+anchor_bottom = 0.82
+theme_override_font_sizes/font_size = 18
+text = "idle"
+
+[node name="TablePanel" type="Panel" parent="." unique_id=1858400049]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.12
+anchor_top = 0.34
+anchor_right = 0.88
+anchor_bottom = 0.83
+
+[node name="ScenarioItemContainer" type="Control" parent="TablePanel" unique_id=1184622644]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = 18.0
+offset_right = -18.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MiniGameContainer" type="Control" parent="TablePanel" unique_id=101924022]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = 18.0
+offset_right = -18.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StatusPanel" type="Panel" parent="." unique_id=390436701]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.7
+anchor_top = 0.06
+anchor_right = 0.97
+anchor_bottom = 0.22
+
+[node name="LoopLabel" type="Label" parent="StatusPanel" unique_id=1874625574]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.06
+anchor_top = 0.12
+anchor_right = 0.94
+anchor_bottom = 0.34
+theme_override_font_sizes/font_size = 16
+text = "Loop: 0"
+
+[node name="ScenarioLabel" type="Label" parent="StatusPanel" unique_id=27810483]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.06
+anchor_top = 0.4
+anchor_right = 0.94
+anchor_bottom = 0.62
+theme_override_font_sizes/font_size = 16
+text = "Scenario: -"
+
+[node name="ProgressLabel" type="Label" parent="StatusPanel" unique_id=2143805894]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.06
+anchor_top = 0.68
+anchor_right = 0.94
+anchor_bottom = 0.9
+theme_override_font_sizes/font_size = 16
+text = "Cleared: 0/3"
+
+[node name="DialogueBox" parent="." unique_id=917170270 instance=ExtResource("2_dialogue")]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.08
+anchor_top = 0.76
+anchor_right = 0.92
+anchor_bottom = 0.97
+
+[node name="TransitionOverlay" type="ColorRect" parent="." unique_id=1625304687]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
+
+[node name="FinalPanel" type="Panel" parent="." unique_id=1747010669]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.28
+anchor_top = 0.3
+anchor_right = 0.72
+anchor_bottom = 0.73
+
+[node name="TitlePanel" type="Panel" parent="." unique_id=637312909]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.28
+anchor_top = 0.24
+anchor_right = 0.72
+anchor_bottom = 0.72

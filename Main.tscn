@@ -1,0 +1,160 @@
+[gd_scene format=3 uid="uid://dbm54at6o1g6b"]
+
+[ext_resource type="Script" uid="uid://chx8e6efcrepo" path="res://Main.gd" id="1_main"]
+[ext_resource type="PackedScene" uid="uid://bukcrosv5uou0" path="res://DialogueBox.tscn" id="2_dialogue"]
+[ext_resource type="Texture2D" uid="uid://2sly0wyl6ec3" path="res://Assets/casino_office_base.png" id="3_bg"]
+[ext_resource type="Texture2D" uid="uid://baxmbvhoiyynm" path="res://Assets/Dealer/dealer_idle.png" id="4_dealer"]
+[ext_resource type="PackedScene" path="res://MiniGames/ScenarioItemView.tscn" id="5_item"]
+[ext_resource type="PackedScene" path="res://Screens/TitleScreen.tscn" id="6_title"]
+[ext_resource type="PackedScene" path="res://Screens/FinalShootScreen.tscn" id="7_final"]
+[ext_resource type="PackedScene" path="res://Screens/EndScreen.tscn" id="8_end"]
+
+[node name="Main" type="Control" unique_id=944095430]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="Background" type="TextureRect" parent="." unique_id=647113489]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Dealer" type="TextureRect" parent="." unique_id=808781117]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.33
+anchor_top = 0.04
+anchor_right = 0.67
+anchor_bottom = 0.29
+mouse_filter = 2
+texture = ExtResource("4_dealer")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LanguagePanel" type="Panel" parent="." unique_id=1515734588]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -268.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 62.0
+
+[node name="LanguageRow" type="HBoxContainer" parent="LanguagePanel" unique_id=1856206725]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = -8.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6
+
+[node name="LanguageLabel" type="Label" parent="LanguagePanel/LanguageRow" unique_id=1524051506]
+custom_minimum_size = Vector2(78, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+vertical_alignment = 1
+
+[node name="TablePanel" type="Panel" parent="." unique_id=1312294158]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.12
+anchor_top = 0.34
+anchor_right = 0.88
+anchor_bottom = 0.83
+
+[node name="MiniGameContainer" type="Control" parent="TablePanel" unique_id=1951343407]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = 18.0
+offset_right = -18.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ScenarioItemView" parent="." unique_id=1660195272 instance=ExtResource("5_item")]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.12
+anchor_top = 0.34
+anchor_right = 0.88
+anchor_bottom = 0.83
+
+[node name="DialogueBox" parent="." unique_id=1016848546 instance=ExtResource("2_dialogue")]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.08
+anchor_top = 0.76
+anchor_right = 0.92
+anchor_bottom = 0.97
+
+[node name="TitleScreen" parent="." unique_id=47607977 instance=ExtResource("6_title")]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.28
+anchor_top = 0.24
+anchor_right = 0.72
+anchor_bottom = 0.72
+
+[node name="FinalShootScreen" parent="." unique_id=2139448310 instance=ExtResource("7_final")]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.28
+anchor_top = 0.3
+anchor_right = 0.72
+anchor_bottom = 0.73
+
+[node name="EndScreen" parent="." unique_id=142655928 instance=ExtResource("8_end")]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.28
+anchor_top = 0.3
+anchor_right = 0.72
+anchor_bottom = 0.73
+
+[node name="TransitionOverlay" type="ColorRect" parent="." unique_id=1600558734]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
+
+[node name="DeveloperButton" type="Button" parent="." unique_id=1592988197]
+custom_minimum_size = Vector2(106, 34)
+layout_mode = 1
+anchors_preset = -1
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 122.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 13
+text = "DEV SKIP"
