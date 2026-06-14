@@ -3,6 +3,8 @@ extends Panel
 signal dialogue_finished
 signal line_started(line_data)
 
+const ResponsiveScale = preload("res://UI/ResponsiveScale.gd")
+
 @onready var speaker_label: Label = $SpeakerLabel
 @onready var state_label: Label = $StateLabel
 @onready var line_label: Label = $LineLabel
@@ -11,11 +13,23 @@ signal line_started(line_data)
 var lines: Array = []
 var current_index := 0
 var active := false
+var base_minimum_size := Vector2.ZERO
 
 
 func _ready() -> void:
 	continue_button.pressed.connect(_on_continue_pressed)
+	base_minimum_size = custom_minimum_size
+	apply_responsive_layout()
+	get_viewport().size_changed.connect(apply_responsive_layout)
 	visible = false
+
+
+func apply_responsive_layout() -> void:
+	custom_minimum_size = ResponsiveScale.size(self, base_minimum_size)
+	speaker_label.add_theme_font_size_override("font_size", ResponsiveScale.font_size(self, 20))
+	state_label.add_theme_font_size_override("font_size", ResponsiveScale.font_size(self, 14))
+	line_label.add_theme_font_size_override("font_size", ResponsiveScale.font_size(self, 22))
+	continue_button.add_theme_font_size_override("font_size", ResponsiveScale.font_size(self, 16))
 
 
 func play_lines(new_lines: Array) -> void:
