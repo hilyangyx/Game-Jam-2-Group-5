@@ -200,8 +200,8 @@ func _background_content_rect() -> Rect2:
 	var texture_size := texture.get_size()
 	if texture_size.x <= 0.0 or texture_size.y <= 0.0:
 		return Rect2(Vector2.ZERO, viewport_size)
-	var scale := maxf(viewport_size.x / texture_size.x, viewport_size.y / texture_size.y)
-	var content_size := texture_size * scale
+	var resize := maxf(viewport_size.x / texture_size.x, viewport_size.y / texture_size.y)
+	var content_size := texture_size * resize
 	return Rect2((viewport_size - content_size) * 0.5, content_size)
 
 
@@ -296,12 +296,12 @@ func _refresh_language_selector() -> void:
 func _resize_language_panel() -> void:
 	if language_panel == null or language_row == null or language_label == null:
 		return
-	var scale := ResponsiveScale.factor(self)
-	var margin := -language_panel_base_offsets.z * scale
-	var panel_height := (language_panel_base_offsets.w - language_panel_base_offsets.y) * scale
-	var padding_x := language_row_base_offsets.x * scale
-	var label_width := language_label_base_minimum_size.x * scale
-	var row_separation := float(language_row_base_separation) * scale
+	var resize := ResponsiveScale.factor(self)
+	var margin := -language_panel_base_offsets.z * resize
+	var panel_height := (language_panel_base_offsets.w - language_panel_base_offsets.y) * resize
+	var padding_x := language_row_base_offsets.x * resize
+	var label_width := language_label_base_minimum_size.x * resize
+	var row_separation := float(language_row_base_separation) * resize
 	_set_panel_style(language_panel, Color(0.045, 0.043, 0.05, 0.94), Color(0.55, 0.42, 0.16, 1.0), maxi(1, roundi(ResponsiveScale.length(self, 1))))
 	language_row.add_theme_constant_override("separation", maxi(1, roundi(row_separation)))
 	language_label.custom_minimum_size = Vector2(label_width, 0)
@@ -309,7 +309,7 @@ func _resize_language_panel() -> void:
 	var button_width_total := 0.0
 	for i in range(language_buttons.size()):
 		var button := language_buttons[i]
-		var button_size := LANGUAGE_BUTTON_BASE_SIZE * scale
+		var button_size := LANGUAGE_BUTTON_BASE_SIZE * resize
 		button_width_total += button_size.x
 		button.custom_minimum_size = button_size
 		button.add_theme_font_size_override("font_size", ResponsiveScale.font_size(self, 14))
